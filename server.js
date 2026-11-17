@@ -8,6 +8,8 @@ import { router } from "./router/router.js";
 const app = express();
 const PORT = 1234;
 
+app.use(express.json());
+
 app.use(cors());
 
 app.use("/api/v1", router);
