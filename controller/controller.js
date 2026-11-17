@@ -3,6 +3,7 @@ import {
   allTermineOverview,
   kundeByEmail,
   newKunde,
+  allTimeslots,
 } from "../service/service.js";
 
 // GET ALL
@@ -22,6 +23,13 @@ export async function getTermineOverview(req, res) {
 export async function getKunde(req, res) {
   const kunde = await kundeByEmail(req.params.email);
   res.status(200).json(kunde);
+}
+
+// GET timeslots
+
+export async function getTimeslots(req, res) {
+  const timeslots = await allTimeslots(req.params.maId, req.params.date);
+  res.status(200).json(timeslots);
 }
 
 // POST

@@ -3,7 +3,10 @@ import {
   getTermineOverview,
   getKundeByEmail,
   addNewKunde,
+  getBookedAppointments,
 } from "../repository/repository.js";
+
+import { generateTimeslots } from "../utils/generateTimeslots.js";
 
 // GET ALL
 
@@ -22,6 +25,14 @@ export async function allTermineOverview() {
 export async function kundeByEmail(email) {
   const kunde = await getKundeByEmail(email);
   return kunde;
+}
+
+// GET timeslots
+
+export async function allTimeslots(maId, date) {
+  const appointmentsMA = await getBookedAppointments(maId, date);
+
+  return generateTimeslots("09:00:00", "18:00:00", appointmentsMA);
 }
 
 // POST
