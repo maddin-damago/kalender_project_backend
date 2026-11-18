@@ -7,6 +7,7 @@ import {
   getMitarbeiterByLeistungsId,
   getLeistungById,
   saveTermin,
+  saveTerminLeistung,
 } from "../repository/repository.js";
 import { getNowDateTimeString } from "../utils/getNowDateTimeString.js";
 import {
@@ -55,18 +56,24 @@ export async function newKunde(kunde) {
 }
 
 export async function saveNewTermin(termin) {
-  termin = {
-    kunde: {
-      vorname: "Klaus",
-      nachname: "Kleber",
-      email: "klaus.kleber@news.de",
-      telefon: "1234/6543452",
-    },
-    ma: 1,
-    leistungen: [1, 2],
-    startdatum: "2026-12-31 09:00:00",
-    enddatum: "tba",
-  };
+  // termin = {
+  //   kunde: {
+  //     vorname: "Klaus",
+  //     nachname: "Kleber",
+  //     email: "klaus.kleber@news.de",
+  //     telefon: "1234/6543452",
+  //   },
+  //   ma: 1,
+  //   leistungen: [1, 2],
+  //   startdatum: "2026-12-31 09:00:00",
+  // };
+
+  // Prüfen, ob Datum in der Vergangenheit liegt
+  const now = getNowDateTimeString();
+
+  if (termin.startdatum < now) {
+    return [];
+  }
 
   // Dauer des Termins anhand der leistungs ids zusammenrechnen
   let termindauerinMinuten = 0;
@@ -74,13 +81,6 @@ export async function saveNewTermin(termin) {
   for (let liD of termin.leistungen) {
     const leistung = await getLeistungById(liD);
     termindauerinMinuten += leistung[0].dauer_in_min;
-  }
-
-  // Prüfen, ob Datum in der Vergangenheit liegt
-  const now = getNowDateTimeString();
-
-  if (termin.startdatum < now) {
-    return [];
   }
 
   // Prüfen, ob Kunde existiert, falls ja id setzen, falls nicht Kunde anlegen und insertId benutzen
@@ -114,6 +114,19 @@ export async function saveNewTermin(termin) {
 
   console.log("endtime datestring :", endTimeDateString);
 
-  // const termin_ = await saveTermin(termin);
-  return [];
+  // termin object speichern, insertId zurückbekommen und für die zwischentabelle termin_leistungen nutzen
+  const terminToSave = {
+    kunde_id: kundeId,
+    mitarbeiter_id: termin.ma,
+    start_datum: termin.startdatum,
+    end_datum: endTimeDateString,
+  };
+
+  const termin_ = await saveTermin(terminToSave);
+
+  for (let liD of termin.leistungen) {
+    await saveTerminLeistung(termin_.insertId, liD);
+  }
+
+  return termin_;
 }

@@ -90,6 +90,16 @@ export async function addNewKunde(kunde) {
   return kundeRow;
 }
 
+export async function saveTerminLeistung(t_id, l_id) {
+  const conn = await pool.getConnection();
+  const [terminRow] = await conn.execute(
+    "INSERT INTO termin_leistungen (termin_id, leistung_id) VALUES (?, ?)",
+    [t_id, l_id],
+  );
+
+  return terminRow;
+}
+
 export async function saveTermin(termin) {
   const conn = await pool.getConnection();
   const [terminRow] = await conn.execute(
