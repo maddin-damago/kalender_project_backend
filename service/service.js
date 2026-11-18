@@ -5,10 +5,15 @@ import {
   addNewKunde,
   getBookedAppointments,
   getMitarbeiterByLeistungsId,
+  getLeistungById,
   saveTermin,
 } from "../repository/repository.js";
 import { getNowDateTimeString } from "../utils/getNowDateTimeString.js";
-import { generateTimeslots } from "../utils/generateTimeslots.js";
+import {
+  generateTimeslots,
+  timeToMinutes,
+  minutesToTime,
+} from "../utils/generateTimeslots.js";
 
 // GET ALL
 
@@ -63,12 +68,22 @@ export async function saveNewTermin(termin) {
     enddatum: "tba",
   };
 
+  // Dauer des Termins anhand der leistungs ids zusammenrechnen
+  let termindauerinMinuten = 0;
+
+  for (let liD of termin.leistungen) {
+    const leistung = await getLeistungById(liD);
+    termindauerinMinuten += leistung[0].dauer_in_min;
+  }
+
+  // Prüfen, ob Datum in der Vergangenheit liegt
   const now = getNowDateTimeString();
 
   if (termin.startdatum < now) {
     return [];
   }
 
+  // Prüfen, ob Kunde existiert, falls ja id setzen, falls nicht Kunde anlegen und insertId benutzen
   const kunde = await getKundeByEmail(termin.kunde.email); // empty [] if not present
   let kundeId;
 
@@ -81,7 +96,24 @@ export async function saveNewTermin(termin) {
     kundeId = kunde.insertId;
   }
 
-  console.log("kunde: " + kundeId);
+  console.log("termindauer: " + termindauerinMinuten);
+
+  // ende des termins berechnen -> startdatum am leerzeichen splitten, index 1 timeInMinutes umwandeln,
+  // dauer des termins dazurechnen, per minutesInTime wieder umwandeln und dann mit dem Datums zusammen mit einem
+  // leerzeichen joinen, um einen gültigen DateTime string zu erhalten
+
+  const dateStringArrayForEndDateCalculation = termin.startdatum.split(" ");
+  const endtime = minutesToTime(
+    timeToMinutes(dateStringArrayForEndDateCalculation[1]) +
+      termindauerinMinuten,
+  );
+
+  dateStringArrayForEndDateCalculation[1] = endtime;
+
+  const endTimeDateString = dateStringArrayForEndDateCalculation.join(" ");
+
+  console.log("endtime datestring :", endTimeDateString);
+
   // const termin_ = await saveTermin(termin);
   return [];
 }

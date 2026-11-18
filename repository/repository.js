@@ -68,6 +68,16 @@ export async function getMitarbeiterByLeistungsId(id) {
   return mitarbeiter;
 }
 
+export async function getLeistungById(id) {
+  const conn = await pool.getConnection();
+  const [leistungRow] = await conn.execute(
+    "SELECT * FROM leistungen WHERE id= ?",
+    [id],
+  );
+
+  return leistungRow;
+}
+
 // POST
 
 export async function addNewKunde(kunde) {
