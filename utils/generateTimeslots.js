@@ -23,18 +23,18 @@ export function generateTimeslots(
   const endMinutes = timeToMinutes(end);
 
   while (currentMinutes <= endMinutes) {
+    const isAvailable = !bookedAppointmentsArray.some(
+      (ba) =>
+        timeToMinutes(ba.beginn) <= currentMinutes &&
+        timeToMinutes(ba.ende) > currentMinutes,
+    );
+
     timeslots.push({
       value: minutesToTime(currentMinutes),
-      isAvailable: !bookedAppointmentsArray.map((ba) => {
-        console.log(minutesToTime(currentMinutes));
-        return (
-          ba.beginn >= minutesToTime(currentMinutes) &&
-          ba.ende <= minutesToTime(currentMinutes)
-        );
-      }),
+      isAvailable: isAvailable,
     });
+
     currentMinutes += intervalMinutes;
   }
-
   return timeslots;
 }

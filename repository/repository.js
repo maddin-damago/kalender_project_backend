@@ -45,7 +45,7 @@ export async function getTermineOverview() {
   return terminRow;
 }
 
-// GET BY "ID"
+// GET BY
 
 export async function getKundeByEmail(email) {
   const conn = await pool.getConnection();
@@ -54,6 +54,18 @@ export async function getKundeByEmail(email) {
   ]);
 
   return kundeRow;
+}
+
+export async function getMitarbeiterByLeistungsId(id) {
+  const conn = await pool.getConnection();
+  const [mitarbeiter] = await conn.execute(
+    `SELECT mitarbeiter_id, l.leistung FROM ma_leistungen
+     JOIN leistungen l ON l.id = leistung_id
+     WHERE leistung_id = ?;`,
+    [id],
+  );
+
+  return mitarbeiter;
 }
 
 // POST
@@ -66,4 +78,14 @@ export async function addNewKunde(kunde) {
   );
 
   return kundeRow;
+}
+
+export async function saveTermin(termin) {
+  const conn = await pool.getConnection();
+  const [terminRow] = await conn.execute(
+    "INSERT INTO termin (kunde_id, mitarbeiter_id, start_datum, end_datum) VALUES (:kunde_id, :mitarbeiter_id, :start_datum, :end_datum)",
+    termin,
+  );
+
+  return terminRow;
 }
