@@ -9,6 +9,8 @@ import {
   saveTermin,
   saveTerminLeistung,
   getTermineForMaAndKunde,
+  getAllLeistungen,
+  findMitarbeiterWithAllLeistungen,
 } from "../repository/repository.js";
 import { getNowDateTimeString } from "../utils/getNowDateTimeString.js";
 import {
@@ -29,6 +31,11 @@ export async function allTermineOverview() {
   return termine;
 }
 
+export async function getLeistungen() {
+  const leistungen = await getAllLeistungen();
+  return leistungen;
+}
+
 // GET BY
 
 export async function kundeByEmail(email) {
@@ -38,6 +45,14 @@ export async function kundeByEmail(email) {
 
 export async function mitarbeiterByLeisuntgsId(id) {
   const ma = await getMitarbeiterByLeistungsId(id);
+  return ma;
+}
+
+export async function mitarbeiterWithAllLeistungen(ids) {
+  const idsArray = ids.split(",");
+
+  const numericIds = idsArray.map((id) => Number(id));
+  const ma = await findMitarbeiterWithAllLeistungen(numericIds);
   return ma;
 }
 

@@ -57,6 +57,13 @@ export async function getTermineForMaAndKunde(k_id, ma_id) {
   return terminRow;
 }
 
+export async function getAllLeistungen() {
+  const conn = await pool.getConnection();
+  const [leistungenRow] = await conn.execute("SELECT * FROM leistungen");
+
+  return leistungenRow;
+}
+
 // GET BY
 
 export async function getKundeByEmail(email) {
@@ -78,6 +85,29 @@ export async function getMitarbeiterByLeistungsId(id) {
   );
 
   return mitarbeiter;
+}
+
+export async function findMitarbeiterWithAllLeistungen(leistungIds) {
+  if (!leistungIds || leistungIds.length === 0) return [];
+
+  const query = `
+  WITH matching_mitarbeiter AS (
+  SELECT mitarbeiter_id
+  FROM ma_leistungen
+  WHERE leistung_id IN (?)
+  GROUP BY mitarbeiter_id
+  HAVING COUNT(DISTINCT leistung_id) = ?
+  )
+  SELECT m.id, m.ma_name
+  FROM matching_mitarbeiter mm
+  JOIN mitarbeiter m ON mm.mitarbeiter_id = m.id;
+    `;
+
+  // mysql2 automatically expands the first array into (?, ?, ...)
+  // and the second parameter provides the count value for the HAVING clause.
+  const [rows] = await pool.query(query, [leistungIds, leistungIds.length]);
+
+  return rows;
 }
 
 export async function getLeistungById(id) {

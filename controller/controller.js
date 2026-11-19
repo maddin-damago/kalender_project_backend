@@ -6,6 +6,8 @@ import {
   allTimeslots,
   mitarbeiterByLeisuntgsId,
   saveNewTermin,
+  getLeistungen,
+  mitarbeiterWithAllLeistungen,
 } from "../service/service.js";
 
 // GET ALL
@@ -20,6 +22,11 @@ export async function getTermineOverview(req, res) {
   res.status(200).json(termine);
 }
 
+export async function getAllLeistungen(req, res) {
+  const leistungen = await getLeistungen();
+  res.status(200).json(leistungen);
+}
+
 // GET BY
 
 export async function getKunde(req, res) {
@@ -27,8 +34,14 @@ export async function getKunde(req, res) {
   res.status(200).json(kunde);
 }
 
-export async function getMitarbeiterByLeistungsId(req, res) {
-  const ma = await mitarbeiterByLeisuntgsId(req.params.leistungs_id);
+// export async function getMitarbeiterByLeistungsId(req, res) {
+//   const ma = await mitarbeiterByLeisuntgsId(req.params.leistungs_id);
+//   res.status(200).json(ma);
+// }
+
+export async function findMitarbeiterWithAllLeistungen(req, res) {
+  console.log(req.params.leistungs_id);
+  const ma = await mitarbeiterWithAllLeistungen(req.params.leistungs_id);
   res.status(200).json(ma);
 }
 
