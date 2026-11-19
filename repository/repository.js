@@ -45,6 +45,18 @@ export async function getTermineOverview() {
   return terminRow;
 }
 
+export async function getTermineForMaAndKunde(k_id, ma_id) {
+  const conn = await pool.getConnection();
+  const [terminRow] = await conn.execute(
+    `SELECT * FROM termin
+     WHERE kunde_id = ?
+     AND mitarbeiter_id = ?;`,
+    [k_id, ma_id],
+  );
+
+  return terminRow;
+}
+
 // GET BY
 
 export async function getKundeByEmail(email) {

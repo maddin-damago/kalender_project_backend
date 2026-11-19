@@ -8,6 +8,7 @@ import {
   getLeistungById,
   saveTermin,
   saveTerminLeistung,
+  getTermineForMaAndKunde,
 } from "../repository/repository.js";
 import { getNowDateTimeString } from "../utils/getNowDateTimeString.js";
 import {
@@ -56,23 +57,11 @@ export async function newKunde(kunde) {
 }
 
 export async function saveNewTermin(termin) {
-  // termin = {
-  //   kunde: {
-  //     vorname: "Klaus",
-  //     nachname: "Kleber",
-  //     email: "klaus.kleber@news.de",
-  //     telefon: "1234/6543452",
-  //   },
-  //   ma: 1,
-  //   leistungen: [1, 2],
-  //   startdatum: "2026-12-31 09:00:00",
-  // };
-
   // Prüfen, ob Datum in der Vergangenheit liegt
   const now = getNowDateTimeString();
 
   if (termin.startdatum < now) {
-    return [];
+    throw new Error("Datum liegt in der Vergangenheit");
   }
 
   // Dauer des Termins anhand der leistungs ids zusammenrechnen
@@ -96,7 +85,17 @@ export async function saveNewTermin(termin) {
     kundeId = kunde.insertId;
   }
 
-  console.log("termindauer: " + termindauerinMinuten);
+  // überprüfen, ob es zwischen diesem Kunden und MA zu diesem Zeitpunkt bereits einen termin gibt
+
+  const currentAppointments = await getTermineForMaAndKunde(kundeId, termin.ma);
+  const date1 = new Date(termin.startdatum.replace(" ", "T"));
+
+  for (let ca of currentAppointments) {
+    const date2 = new Date(ca.start_datum);
+    if (date1.getTime() === date2.getTime()) {
+      throw new Error("Termin bereits vorhanden");
+    }
+  }
 
   // ende des termins berechnen -> startdatum am leerzeichen splitten, index 1 timeInMinutes umwandeln,
   // dauer des termins dazurechnen, per minutesInTime wieder umwandeln und dann mit dem Datums zusammen mit einem
@@ -111,8 +110,6 @@ export async function saveNewTermin(termin) {
   dateStringArrayForEndDateCalculation[1] = endtime;
 
   const endTimeDateString = dateStringArrayForEndDateCalculation.join(" ");
-
-  console.log("endtime datestring :", endTimeDateString);
 
   // termin object speichern, insertId zurückbekommen und für die zwischentabelle termin_leistungen nutzen
   const terminToSave = {

@@ -47,10 +47,10 @@ export async function addNewKunde(req, res) {
 }
 
 export async function saveTermin(req, res) {
-  const termin = await saveNewTermin(req.body);
-  if (termin.length === 0) {
-    res.status(418).json("Error");
-  } else {
+  try {
+    const termin = await saveNewTermin(req.body);
     res.status(201).json(termin);
+  } catch (err) {
+    res.status(400).json(err.message);
   }
 }
