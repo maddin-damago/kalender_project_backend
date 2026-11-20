@@ -75,14 +75,9 @@ export async function getKundeByEmail(email) {
   return kundeRow;
 }
 
-export async function getMitarbeiterByLeistungsId(id) {
+export async function getMitarbeiter() {
   const conn = await pool.getConnection();
-  const [mitarbeiter] = await conn.execute(
-    `SELECT mitarbeiter_id, l.leistung FROM ma_leistungen
-     JOIN leistungen l ON l.id = leistung_id
-     WHERE leistung_id = ?;`,
-    [id],
-  );
+  const [mitarbeiter] = await conn.execute(`SELECT * FROM mitarbeiter`);
 
   return mitarbeiter;
 }

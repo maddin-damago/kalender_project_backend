@@ -5,7 +5,7 @@ import {
   getKunde,
   addNewKunde,
   getTimeslots,
-  // getMitarbeiterByLeistungsId,
+  getMitarbeiter,
   saveTermin,
   getAllLeistungen,
   findMitarbeiterWithAllLeistungen,
@@ -23,9 +23,7 @@ router.post("/termine", saveTermin);
 router.get("/kunde/:email", (req, res) => getKunde(req, res));
 router.post("/kunde", addNewKunde);
 
-// router.get("/mitarbeiter/:leistungs_id", (req, res) =>
-//   getMitarbeiterByLeistungsId(req, res),
-// );
+router.get("/mitarbeiter", getMitarbeiter);
 
 router.get("/mitarbeiter/:leistungs_id", (req, res) =>
   findMitarbeiterWithAllLeistungen(req, res),

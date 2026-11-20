@@ -4,7 +4,7 @@ import {
   getKundeByEmail,
   addNewKunde,
   getBookedAppointments,
-  getMitarbeiterByLeistungsId,
+  getMitarbeiter,
   getLeistungById,
   saveTermin,
   saveTerminLeistung,
@@ -43,8 +43,8 @@ export async function kundeByEmail(email) {
   return kunde;
 }
 
-export async function mitarbeiterByLeisuntgsId(id) {
-  const ma = await getMitarbeiterByLeistungsId(id);
+export async function mitarbeiter() {
+  const ma = await getMitarbeiter();
   return ma;
 }
 

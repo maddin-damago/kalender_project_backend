@@ -4,7 +4,7 @@ import {
   kundeByEmail,
   newKunde,
   allTimeslots,
-  mitarbeiterByLeisuntgsId,
+  mitarbeiter,
   saveNewTermin,
   getLeistungen,
   mitarbeiterWithAllLeistungen,
@@ -34,10 +34,10 @@ export async function getKunde(req, res) {
   res.status(200).json(kunde);
 }
 
-// export async function getMitarbeiterByLeistungsId(req, res) {
-//   const ma = await mitarbeiterByLeisuntgsId(req.params.leistungs_id);
-//   res.status(200).json(ma);
-// }
+export async function getMitarbeiter(req, res) {
+  const ma = await mitarbeiter();
+  res.status(200).json(ma);
+}
 
 export async function findMitarbeiterWithAllLeistungen(req, res) {
   console.log(req.params.leistungs_id);
